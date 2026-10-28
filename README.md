@@ -7,11 +7,12 @@ results.
 
 The results are on Zenodo:
 [10.5281/zenodo.23243286](https://doi.org/10.5281/zenodo.23243286). The record
-holds every measured result behind the paper's numbers (covariance errors,
-throughput and state, implementation checks, reproducibility, the closed-form
-verification and the band-edge coherence), with its configuration, seeds and
-the commits that produced it, and the noise spectra the results were computed
-for. Its `README.md` describes the layout, the common fields and the measured
+holds the measured results behind the paper's tables, data figures and the
+numbers quoted from them (covariance errors, throughput and state,
+implementation checks, reproducibility, the closed-form verification and the
+band-edge coherence), with their configuration, their seeds or the rule that
+derives them, the commits that produced them, and the noise spectra the results
+were computed for. Its `README.md` describes the layout, the common fields and the measured
 quantities of each kind of result.
 
 The noise itself was generated with
@@ -66,7 +67,7 @@ are computed analytically and read no data. The numbers of the closed-form
 verification are printed by `make_fig_c1_residuals.py`, and those of the
 band-edge study can be read from `results/edge-leakage/`.
 
-The tables and `numbers.tex` reproduce the paper's byte for byte. The figures
+The six generated tables and `numbers.tex` reproduce the paper's byte for byte. The figures
 render identically to the paper's with the pinned library versions; the PDF
 files themselves may differ in their internal byte layout.
 
@@ -77,8 +78,9 @@ files themselves may differ in their internal byte layout.
   files, the crossfade's error against window length, the accuracy–throughput
   join, the crossfade blend weights, the analysis bands and spectra, and the
   LaTeX table writers.
-- `tests/`: unit tests of that code, and a check that the tables match the
-  published ones when the data has been fetched.
+- `tests/`: unit tests of that code, and checks that the tables match the
+  published ones and that the band table matches the data. These two run only
+  once the data has been fetched, so CI, which does not fetch it, skips them.
 
 ## Citing
 
