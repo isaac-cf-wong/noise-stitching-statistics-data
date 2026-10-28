@@ -10,7 +10,7 @@ The results are on Zenodo:
 holds the measured results behind the paper's tables, data figures and the
 numbers quoted from them (covariance errors, throughput and state,
 implementation checks, reproducibility, the closed-form verification and the
-band-edge coherence), with their configuration, their seeds or the rule that
+band-edge coherence), with their configuration, the seeds of the sampled results or the rule that
 derives them, the commits that produced them, and the noise spectra the results
 were computed for. Its `README.md` describes the layout, the common fields and the measured
 quantities of each kind of result.
