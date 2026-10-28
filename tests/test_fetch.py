@@ -8,6 +8,7 @@ import io
 import json
 import sys
 import tarfile
+import urllib.error
 from pathlib import Path
 from types import ModuleType
 
@@ -92,3 +93,41 @@ def test_refuses_a_checksum_it_cannot_check(fetch: ModuleType, monkeypatch: pyte
     monkeypatch.setattr(fetch.urllib.request, "urlopen", lambda *_, **__: io.BytesIO(json.dumps(record).encode()))
     with pytest.raises(ValueError, match="unexpected checksum"):
         fetch.record_files("1")
+
+
+def test_a_record_that_is_not_public_is_named_as_such(fetch: ModuleType, monkeypatch: pytest.MonkeyPatch) -> None:
+    """A missing record reads as one, with the way round it, not as an HTTP traceback."""
+
+    def missing(*_: object, **__: object) -> None:
+        raise urllib.error.HTTPError("https://x", 404, "NOT FOUND", None, None)  # type: ignore[arg-type]
+
+    monkeypatch.setattr(fetch.urllib.request, "urlopen", missing)
+    with pytest.raises(LookupError, match="not public"):
+        fetch.record_files("1")
+
+
+def test_an_interrupted_download_leaves_no_partial_file(
+    fetch: ModuleType, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A transfer that breaks after writing part of the file removes what it wrote."""
+
+    class Broken(io.BytesIO):
+        def read(self, size: int = -1) -> bytes:
+            if self.tell():
+                raise ConnectionResetError("connection reset")
+            return super().read(4)
+
+    partial = tmp_path / "out.bin.part"
+    seen = []
+    original = Path.unlink
+
+    def record(path: Path, *arguments: object, **options: object) -> None:
+        seen.append(path.exists())
+        original(path, *arguments, **options)
+
+    monkeypatch.setattr(fetch.urllib.request, "urlopen", lambda *_, **__: Broken(b"partial content"))
+    monkeypatch.setattr(Path, "unlink", record)
+    with pytest.raises(ConnectionResetError, match="connection reset"):
+        fetch.download("https://x", "0" * 32, tmp_path / "out.bin")
+    assert seen == [True]
+    assert not partial.exists()

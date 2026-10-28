@@ -11,7 +11,8 @@ holds every measured result behind the paper's numbers (covariance errors,
 throughput and state, implementation checks, reproducibility, the closed-form
 verification and the band-edge coherence), with its configuration, seeds and
 the commits that produced it, and the noise spectra the results were computed
-for. Its `README.md` describes every file and field.
+for. Its `README.md` describes the layout, the common fields and the measured
+quantities of each kind of result.
 
 The noise itself was generated with
 [gwmock-noise](https://github.com/Leuven-Gravity-Institute/gwmock-noise), at
@@ -40,12 +41,12 @@ uv run python scripts/make_fig_c1_residuals.py
 
 Each script takes `--data DIR` (default `data/`) and `--output DIR` (default
 `output/`). `fetch_data.py` checks every downloaded file against the MD5
-checksum Zenodo publishes for it, and `--archive results.tar.gz` unpacks a copy
-you already have instead of downloading.
+checksum Zenodo publishes for it. `--archive results.tar.gz` unpacks a copy you
+already have instead, without a checksum to check it against.
 
 | output                                     | in the paper                                                              |
 | ------------------------------------------ | ------------------------------------------------------------------------- |
-| `generated/numbers.tex`                    | every number the text quotes, as `\rv{<key>}` macros                      |
+| `generated/numbers.tex`                    | the numbers the text quotes through `\rv{<key>}` macros                  |
 | `generated/tab_errors_specified.tex`       | covariance errors of every generator, smoothly continued band edge        |
 | `generated/tab_errors_hard.tex`            | the same with the spectrum cut to zero below the band                     |
 | `generated/tab_costs.tex`                  | throughput, stored state and rebuild cost                                 |
@@ -61,7 +62,9 @@ you already have instead of downloading.
 | `figures/fig_c1_residuals.pdf`             | the measured crossfade covariance against its closed form                 |
 
 The two schematic figures, `fig_response_folding` and `fig_parallel_responses`,
-are computed analytically and read no data.
+are computed analytically and read no data. The numbers of the closed-form
+verification are printed by `make_fig_c1_residuals.py`, and those of the
+band-edge study can be read from `results/edge-leakage/`.
 
 The tables and `numbers.tex` reproduce the paper's byte for byte. The figures
 render identically to the paper's with the pinned library versions; the PDF

@@ -2,7 +2,7 @@
 
 all: tables figures
 
-data/results data/psd:
+data/results:
 	uv run python scripts/fetch_data.py
 
 data: data/results

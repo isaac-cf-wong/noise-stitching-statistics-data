@@ -6,11 +6,14 @@ Skipped until the data has been fetched with ``scripts/fetch_data.py``.
 from __future__ import annotations
 
 import hashlib
+import json
 import subprocess
 import sys
 from pathlib import Path
 
 import pytest
+
+from noise_stitching_data.spectra import analysis_band
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -27,3 +30,13 @@ def test_the_tables_are_the_published_ones(tmp_path: Path) -> None:
     expected = dict(reversed(line.split()) for line in EXPECTED.read_text().splitlines())
     written = {path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in (tmp_path / "generated").iterdir()}
     assert written == expected
+
+
+@pytest.mark.skipif(not (DATA / "results").is_dir(), reason="the data has not been fetched")
+def test_the_bands_are_those_the_results_record() -> None:
+    """The band table agrees with the band every band-edge result was computed on."""
+    paths = sorted((DATA / "results" / "edge-leakage").rglob("*.json"))
+    assert paths
+    for path in paths:
+        results = json.loads(path.read_text(encoding="utf-8"))["results"]
+        assert analysis_band(results["arm"]) == tuple(results["band_hz"]), path.name

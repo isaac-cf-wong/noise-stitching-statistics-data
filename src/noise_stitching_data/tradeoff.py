@@ -1,6 +1,6 @@
 """Accuracy against throughput, with the stored state alongside.
 
-Joins the exact total covariance errors of :mod:`noise_stitching_data.comparison`
+Joins the exact total covariance errors of the released ``results/exact`` snapshots
 with the throughput and state bytes of the cost table, method by method, and finds the
 methods no other method beats on both accuracy and throughput. Nothing here measures:
 it reads frozen result snapshots and joins them on the method's name and configuration.

@@ -115,9 +115,9 @@ def _draw_residual_map(axes: plt.Axes, result: Comparison, support: int, title: 
         The image, so that a colour bar can be attached to it.
     """
     lags = result.lags
-    # The colour scale ends exactly at the criterion's critical value, so a cell
-    # that saturates it is a cell that fails. None does, and that is readable
-    # from the figure without reading a number off it.
+    # The colour scale ends exactly at the critical value, so a saturated cell
+    # is a residual beyond it. None is, and that is readable from the figure
+    # without reading a number off it.
     limit = result.critical_value
     image = axes.imshow(
         result.residual_grid,
@@ -137,7 +137,7 @@ def _draw_residual_map(axes: plt.Axes, result: Comparison, support: int, title: 
     axes.set_title(title, loc="left")
 
     # The extreme cell is marked as well as quoted: the largest residual is the
-    # quantity the criterion is read on, and a reader should be able to see
+    # quantity compared with the critical value, and a reader should be able to see
     # where on the grid it sits rather than take its size on trust.
     flat = int(np.nanargmax(np.abs(result.residual_grid)))
     phase_index, lag_index = np.unravel_index(flat, result.residual_grid.shape)

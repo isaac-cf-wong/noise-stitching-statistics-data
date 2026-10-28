@@ -25,6 +25,7 @@ LOW_FREQUENCY_HZ: dict[str, float] = {
     "ce_wideband": 5.0,
     "et_d_smooth": 5.0,
     "et10_full_cryo_lines": 5.0,
+    "et15_full_cryo_lines": 5.0,
 }
 
 

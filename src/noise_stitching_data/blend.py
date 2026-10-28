@@ -239,8 +239,7 @@ def stitched_autocovariance(
     Args:
         weights: The crossfade geometry.
         chunk_autocovariance: The circulant chunk autocovariance, of length
-            ``weights.window_size``, as returned by
-            :func:`noise_stitching_data.chunk_covariance.circulant_autocovariance`.
+            ``weights.window_size``.
         phase: Phase of the earlier-indexed sample within the stride.
         lags: Integer lags, of any shape.
 

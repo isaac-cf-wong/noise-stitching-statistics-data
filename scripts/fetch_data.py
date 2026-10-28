@@ -22,6 +22,7 @@ import json
 import shutil
 import sys
 import tarfile
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -50,10 +51,19 @@ def record_files(record_id: str) -> dict[str, tuple[str, str]]:
         The files.
 
     Raises:
+        LookupError: If Zenodo has no public record of that number.
         ValueError: If a file's checksum is not an MD5 checksum.
     """
-    with urllib.request.urlopen(f"https://zenodo.org/api/records/{record_id}", timeout=60) as response:
-        record = json.load(response)
+    try:
+        with urllib.request.urlopen(f"https://zenodo.org/api/records/{record_id}", timeout=60) as response:
+            record = json.load(response)
+    except urllib.error.HTTPError as error:
+        if error.code in {404, 410}:
+            raise LookupError(
+                f"Zenodo record {record_id} is not public (HTTP {error.code}). "
+                "If you have the archive, unpack it with --archive results.tar.gz."
+            ) from error
+        raise
     files = {}
     for entry in record["files"]:
         algorithm, _, digest = entry["checksum"].partition(":")
@@ -87,8 +97,12 @@ def download(url: str, expected_md5: str, target: Path) -> None:
         print(f"{target.name}: already present and checked")
         return
     partial = target.with_name(target.name + ".part")
-    with urllib.request.urlopen(url, timeout=60) as response, partial.open("wb") as stream:
-        shutil.copyfileobj(response, stream, CHUNK_BYTES)
+    try:
+        with urllib.request.urlopen(url, timeout=60) as response, partial.open("wb") as stream:
+            shutil.copyfileobj(response, stream, CHUNK_BYTES)
+    except BaseException:
+        partial.unlink(missing_ok=True)
+        raise
     actual = md5_of(partial)
     if actual != expected_md5:
         partial.unlink()
@@ -124,17 +138,24 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--data", type=Path, default=DEFAULT_DATA, help="where to unpack (default: data/)")
     parser.add_argument("--record", default=RECORD_ID, help=f"the Zenodo record (default: {RECORD_ID})")
-    parser.add_argument("--archive", type=Path, help="unpack this local results.tar.gz instead of downloading")
+    parser.add_argument(
+        "--archive", type=Path, help="unpack this local results.tar.gz instead of downloading; it is not checksummed"
+    )
     arguments = parser.parse_args()
     data = arguments.data
-    data.mkdir(parents=True, exist_ok=True)
     archive = arguments.archive
     if archive is None:
+        try:
+            files = record_files(arguments.record)
+        except LookupError as error:
+            print(error, file=sys.stderr)
+            return 1
         downloads = data / "download"
-        downloads.mkdir(exist_ok=True)
-        for name, (url, md5) in record_files(arguments.record).items():
+        downloads.mkdir(parents=True, exist_ok=True)
+        for name, (url, md5) in files.items():
             download(url, md5, downloads / name)
         archive = downloads / ARCHIVE
+    data.mkdir(parents=True, exist_ok=True)
     unpack(archive, data)
     return 0
 
