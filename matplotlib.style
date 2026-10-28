@@ -1,0 +1,59 @@
+# To use this file, in a python script run
+# >>> import matplotlib
+# >>> matplotlib.style.use("/path/to/matplotlib.style")
+
+# Increase the default DPI, and change the file type from png to pdf
+savefig.dpi             :   500
+savefig.format          :   pdf
+
+# Set the figure size
+figure.figsize          :   3.375, 2.8
+
+# Turn on minor ticks, top and right axis ticks
+xtick.top               :   True
+ytick.right             :   True
+xtick.minor.visible     :   True
+ytick.minor.visible     :   True
+
+# Set the major and minor tick-mark lengths
+xtick.major.size        : 4  # default 3.5
+ytick.major.size        : 4  # default 3.5
+xtick.minor.size        : 2  # default 2
+ytick.minor.size        : 2  # default 2
+
+# Change the tick-mark and axes widths, as well as the widths of plotted lines,
+# to be consistent with the font weight
+xtick.major.width       : 0.8  # default 0.8
+ytick.major.width       : 0.8  # default 0.8
+xtick.minor.width       : 0.6  # default 0.6
+ytick.minor.width       : 0.6  # default 0.6
+
+axes.linewidth          : 1    # default 0.8
+lines.linewidth         : 0.8  # default 1.5
+errorbar.capsize        : 2
+lines.markersize        : 4
+
+# Increase the padding between the ticklabels and the axes, to prevent
+# overlap in the lower lefthand corner
+xtick.major.pad         : 3
+ytick.major.pad         : 3
+xtick.minor.pad         : 3
+ytick.minor.pad         : 3
+
+# Set the font sizes
+font.serif              : ["cmr10"]
+font.family             : serif
+text.usetex             : True
+font.size               : 8
+legend.fontsize         : 5
+axes.labelsize          : 8
+xtick.labelsize         : 8
+ytick.labelsize         : 8
+
+# Set the legend handling
+axes.labelpad           : 4.0
+legend.handlelength     : 1.5
+legend.borderpad        : 0.4
+legend.frameon          : True
+legend.handletextpad    : 0.8
+legend.borderaxespad    : 0.8

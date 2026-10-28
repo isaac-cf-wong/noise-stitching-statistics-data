@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "noise-stitching-data"
+version = "1.0.0"
+description = "Reproduce the tables and figures of the streaming Gaussian noise generator comparison from its data release."
+readme = "README.md"
+license = "BSD-3-Clause"
+authors = [{ name = "Isaac C. F. Wong" }]
+requires-python = ">=3.12"
+dependencies = [
+  # Pinned to the versions the paper's figures were drawn with, so that a
+  # reproduced figure renders identically to the published one.
+  "numpy==2.5.3",
+  "matplotlib==3.11.2",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.3.0", "ruff>=0.16.7"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/noise_stitching_data"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+lint.extend-select = ["E", "F", "W", "I", "UP", "N", "B", "A", "C4", "PT", "RUF", "PL", "SIM", "T10", "D"]
+lint.ignore = ["E501"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "PLR2004"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
