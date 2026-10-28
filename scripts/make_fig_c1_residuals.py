@@ -4,7 +4,8 @@
 Reads ``<data>/results/verification.json``: the standardized residuals of the measured
 crossfade covariance against its closed form, over lag and block phase, for the
 generator's blend phases and for an alternative weight pair. Writes
-``<output>/figures/fig_c1_residuals.pdf`` and prints the tail fraction the text quotes.
+``<output>/figures/fig_c1_residuals.pdf`` and prints every number the text quotes from the
+verification: each arm's summary, including the quarter-statistics arm the figure does not draw.
 
 Usage::
 
@@ -215,12 +216,35 @@ def draw(campaign: Campaign) -> plt.Figure:
     return figure
 
 
-def report(campaign: Campaign) -> None:
-    """Print the share of residuals beyond the tail threshold, against the standard normal's.
+#: The summary fields of each arm that the text quotes.
+SUMMARY_FIELDS = (
+    "n_realizations",
+    "n_blocks",
+    "n_cells",
+    "max_abs_residual",
+    "critical_value",
+    "mean_residual",
+    "std_residual",
+    "beyond_support_max_abs_residual",
+    "max_deviation",
+    "median_standard_error",
+    "admissible_scale",
+    "ks_distance",
+)
+
+
+def report(data: Path, campaign: Campaign) -> None:
+    """Print each arm's summary and the share of residuals beyond the tail threshold.
 
     Args:
+        data: The unpacked data release.
         campaign: The campaign that was drawn.
     """
+    results = json.loads((data / "results" / "verification.json").read_text(encoding="utf-8"))["results"]
+    for arm in ("headline", "quarter", "alternative"):
+        print(f"{arm}: {results[arm]['label']}")
+        for name in SUMMARY_FIELDS:
+            print(f"  {name}: {results[arm][name]}")
     fraction_outside = float(np.mean(np.abs(campaign.headline.residuals) > TAIL_THRESHOLD))
     expected = math.erfc(TAIL_THRESHOLD / math.sqrt(2.0))
     print(f"cells beyond |z| = {TAIL_THRESHOLD:g}: measured {fraction_outside:.4f}, standard normal {expected:.4f}")
@@ -236,7 +260,7 @@ def main() -> None:
         output.parent.mkdir(parents=True, exist_ok=True)
         figure.savefig(output, format="pdf", metadata=PDF_METADATA)
     plt.close(figure)
-    report(campaign)
+    report(data, campaign)
     print(f"wrote {output}")
 
 
